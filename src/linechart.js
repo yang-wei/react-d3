@@ -169,18 +169,31 @@ var DataSeries = React.createClass({
   },
 
   render: function() {
-    var self = this;
+
+    var props = this.props;
+
     var interpolatePath = d3.svg.line()
-        .x(function(d) { return self.props.xScale(d.x); })
-        .y(function(d) { return self.props.yScale(d.y); })
-        .interpolate(this.props.interpolate);
+        .x(function(d) { return props.xScale(d.x); })
+        .y(function(d) { return props.yScale(d.y); })
+        .interpolate(props.interpolate);
+
+    var circles = [];
+
+    props.data.forEach(function(point, i) {
+      circles.push(<Circle cx={props.xScale(point.x)} cy={props.yScale(point.y)} r={props.pointRadius} key={i} />);
+    }.bind(this));
 
     return (
-      <Line path={interpolatePath(this.props.data)} />
+        <g>
+          <Line path={interpolatePath(this.props.data)} />
+          {circles}
+        </g>
     )
   }
 
 });
+
+exports.DataSeries = DataSeries;
 
 var LineChart = React.createClass({
 
@@ -196,7 +209,9 @@ var LineChart = React.createClass({
       margins: {top: 20, right: 30, bottom: 30, left: 30},
       pointRadius: 3,
       width: 400,
-      height: 200
+      height: 200,
+      xScale: this.props.xScale,
+      yScale: this.props.yScale
     }
   },
 
@@ -226,25 +241,18 @@ var LineChart = React.createClass({
       .domain([0, maxY])
       .range([this.props.height - topBottomMargins, 0]);
 
-    var circles = [];
-
-    this.props.data.forEach(function(point, i) {
-      circles.push(<Circle cx={xScale(point.x)} cy={yScale(point.y)} r={this.props.pointRadius} key={i} />);
-    }.bind(this));
-
     var trans = "translate(" + margins.left + "," + margins.top + ")"
 
     return (
       <Chart width={this.props.width} height={this.props.height}>
         <g transform={trans}>
           <DataSeries 
-            xScale={xScale}
-            yScale={yScale}
+            pointRadius={this.props.pointRadius}
             data={this.props.data}
             width={this.props.width - sideMargins}
             height={this.props.height - topBottomMargins}
           />
-          {circles}
+          {this.props.children}
           <YAxis 
             yScale={yScale}
             margins={margins}

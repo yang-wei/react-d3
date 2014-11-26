@@ -5,6 +5,7 @@ var pkg = require('../package.json');
 var d3 = require('d3');
 var BarChart = require('../src/barchart').BarChart;
 var LineChart = require('../src/linechart').LineChart;
+var LineDataSeries = require('../src/linechart').LineDataSeries;
 var PieChart = require('../src/piechart').PieChart;
 var AreaChart = require('../src/areachart').AreaChart;
 var datagen = require('../utils/datagen');
@@ -88,7 +89,8 @@ var Demos = React.createClass({displayName: 'Demos',
         ), 
         React.createElement("div", {className: "row"}, 
           React.createElement("div", {className: "col-md-6"}, 
-            React.createElement(LineChart, {data: lineData, width: 400, height: 200})
+            React.createElement(LineChart, {data: lineData, width: 400, height: 200}
+            )
           ), 
           React.createElement("div", {className: "col-md-6"}, 
             React.createElement("pre", {ref: "block"}, 
@@ -43355,9 +43357,9 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":"/home/eric/repos/react-d3/node_modules/react/lib/React.js"}],"/home/eric/repos/react-d3/package.json":[function(require,module,exports){
-module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={
+module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports=module.exports={
   "name": "react-d3",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "ReactJS charts using d3",
   "author": "Eric S. Bullington",
   "homepage": "http://esbullington.github.io/react-d3/",
@@ -43419,14 +43421,11 @@ module.exports=module.exports=module.exports=module.exports=module.exports=modul
 },{}],"/home/eric/repos/react-d3/src/areachart.js":[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
-window.React = React;
 var pkg = require('../package.json');
 var d3 = require('d3');
 var Chart = require('./common').Chart;
 
-// Working on axes, not yet functional
 var XAxis = React.createClass({displayName: 'XAxis',
-
 
   componentWillReceiveProps: function(props) {
 
@@ -44137,18 +44136,31 @@ var DataSeries = React.createClass({displayName: 'DataSeries',
   },
 
   render: function() {
-    var self = this;
+
+    var props = this.props;
+
     var interpolatePath = d3.svg.line()
-        .x(function(d) { return self.props.xScale(d.x); })
-        .y(function(d) { return self.props.yScale(d.y); })
-        .interpolate(this.props.interpolate);
+        .x(function(d) { return props.xScale(d.x); })
+        .y(function(d) { return props.yScale(d.y); })
+        .interpolate(props.interpolate);
+
+    var circles = [];
+
+    props.data.forEach(function(point, i) {
+      circles.push(React.createElement(Circle, {cx: props.xScale(point.x), cy: props.yScale(point.y), r: props.pointRadius, key: i}));
+    }.bind(this));
 
     return (
-      React.createElement(Line, {path: interpolatePath(this.props.data)})
+        React.createElement("g", null, 
+          React.createElement(Line, {path: interpolatePath(this.props.data)}), 
+          circles
+        )
     )
   }
 
 });
+
+exports.DataSeries = DataSeries;
 
 var LineChart = React.createClass({displayName: 'LineChart',
 
@@ -44164,7 +44176,9 @@ var LineChart = React.createClass({displayName: 'LineChart',
       margins: {top: 20, right: 30, bottom: 30, left: 30},
       pointRadius: 3,
       width: 400,
-      height: 200
+      height: 200,
+      xScale: this.props.xScale,
+      yScale: this.props.yScale
     }
   },
 
@@ -44194,25 +44208,18 @@ var LineChart = React.createClass({displayName: 'LineChart',
       .domain([0, maxY])
       .range([this.props.height - topBottomMargins, 0]);
 
-    var circles = [];
-
-    this.props.data.forEach(function(point, i) {
-      circles.push(React.createElement(Circle, {cx: xScale(point.x), cy: yScale(point.y), r: this.props.pointRadius, key: i}));
-    }.bind(this));
-
     var trans = "translate(" + margins.left + "," + margins.top + ")"
 
     return (
       React.createElement(Chart, {width: this.props.width, height: this.props.height}, 
         React.createElement("g", {transform: trans}, 
           React.createElement(DataSeries, {
-            xScale: xScale, 
-            yScale: yScale, 
+            pointRadius: this.props.pointRadius, 
             data: this.props.data, 
             width: this.props.width - sideMargins, 
             height: this.props.height - topBottomMargins}
           ), 
-          circles, 
+          this.props.children, 
           React.createElement(YAxis, {
             yScale: yScale, 
             margins: margins, 

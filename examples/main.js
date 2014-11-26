@@ -4,6 +4,7 @@ var pkg = require('../package.json');
 var d3 = require('d3');
 var BarChart = require('../src/barchart').BarChart;
 var LineChart = require('../src/linechart').LineChart;
+var LineDataSeries = require('../src/linechart').LineDataSeries;
 var PieChart = require('../src/piechart').PieChart;
 var AreaChart = require('../src/areachart').AreaChart;
 var datagen = require('../utils/datagen');
@@ -87,7 +88,8 @@ var Demos = React.createClass({
         </div>
         <div className="row">
           <div className="col-md-6">
-            <LineChart data={lineData} width={400} height={200} />
+            <LineChart data={lineData} width={400} height={200} >
+            </LineChart>
           </div>
           <div className="col-md-6">
             <pre ref='block'>
