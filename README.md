@@ -29,7 +29,7 @@ var BarChart = rd3.BarChart;
 var LineChart = rd3.LineChart;
 var PieChart = rd3.PieChart;
 var AreaChart = rd3.AreaChart;
-var Treemap = rd3.Treemap;
+var TreemapChart = rd3.TreemapChart;
 var ScatterChart = rd3.ScatterChart;
 ```
 
