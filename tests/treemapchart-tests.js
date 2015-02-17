@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 describe('Treemap', function() {
   it('renders treemap', function() {
     var React = require('react/addons');
-    var Treemap = require('../src/treemap').Treemap;
+    var Treemap = require('../src/treemapchart').TreemapChart;
     var generate = require('../utils/datagen').generateArrayOfNumbers;
     var TestUtils = React.addons.TestUtils;
 
