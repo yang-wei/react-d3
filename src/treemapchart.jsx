@@ -98,7 +98,7 @@ var DataSeries = React.createClass({
 
 });
 
-var Treemap = React.createClass({
+var TreemapChart = React.createClass({
 
   propTypes: {
     margins: React.PropTypes.object,
@@ -146,4 +146,4 @@ var Treemap = React.createClass({
 
 });
 
-exports.Treemap = Treemap;
+exports.TreemapChart = TreemapChart;
